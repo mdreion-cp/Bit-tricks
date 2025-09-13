@@ -1,0 +1,56 @@
+count bit from 0 to n;;;;
+suppose i have given input 7;;;
+then from 0 to 7 ,the count of all set bit is 12 ,which is the output ....
+#include <bits/stdc++.h>
+using namespace std;
+#define nl '\n'
+#define ll long long
+const double pi = 3.141592653589793;
+const int MOD = 1e9+7;
+
+ll getLeftmostBit(ll n)
+{
+    ll m = 0;
+    while (n > 1) {
+        n = n >> 1;
+        m++;
+    }
+    return m;
+}
+
+ll getNextLeftmostBit(ll n, ll m)
+{
+    ll temp = 1 << m;
+    while (n < temp) {
+        temp = temp >> 1;
+        m--;
+    }
+    return m;
+}
+
+ll countSetBits(ll n)
+{
+    if (n == 0)
+        return 0;
+
+    ll m = getLeftmostBit(n);
+    m = getNextLeftmostBit(n, m);
+
+    if (n == (1LL << (m + 1)) - 1)
+        return (m + 1) * (1LL << m);
+
+    n = n - (1LL << m);
+    return (n + 1) + countSetBits(n) + m * (1LL << (m - 1));
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    ll n;
+    cin >> n;
+    cout << countSetBits(n) << nl;
+
+    return 0;
+}
