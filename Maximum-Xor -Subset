@@ -1,0 +1,59 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define nl '\n'
+#define ll long long
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    cin >> n;
+    vector<ll> a(n);
+    for(int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
+
+    // Initialize basis array for each bit (0..63)
+    vector<ll> basis(64, 0);
+
+    // Build the basis
+    for(int idx = 0; idx < n; idx++) {
+        ll x = a[idx];  // current number to insert
+        // Try to reduce it using the existing basis
+        for(int bit = 63; bit >= 0; bit--) {
+            ll mask = 1LL << bit;   // mask for the current bit
+
+            if((x & mask) == 0) {
+                // This bit is 0 in x, skip
+                continue;
+            }
+
+            if(basis[bit] == 0) {
+                // No basis vector yet with this highest bit
+                // So we can use x as the new basis vector
+                basis[bit] = x;
+                // Inserted, stop reducing further
+                break;
+            } else {
+                // A basis vector exists with this bit
+                // Remove that bit from x by XOR
+                x = x ^ basis[bit];
+                // Continue checking lower bits
+            }
+        }
+        // If x becomes 0 here, it is already representable by existing basis
+    }
+
+    // Now compute the maximum XOR from the basis
+    ll maxXor = 0;
+    for(int bit = 63; bit >= 0; bit--) {
+        if((maxXor ^ basis[bit]) > maxXor) {
+            // XORing this basis vector increases the value
+            maxXor = maxXor ^ basis[bit];
+        }
+        // else skip it
+    }
+
+    cout << maxXor << nl;
+}
