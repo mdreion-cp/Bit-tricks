@@ -1,0 +1,32 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+/*
+    Prefix XOR Algorithm
+    --------------------
+    - prefixXor[i] stores XOR of all elements from index 0 to i
+    - subarray XOR [L...R] can be found as:
+        if L == 0 → prefixXor[R]
+        else      → prefixXor[R] ^ prefixXor[L-1]
+*/
+
+int main() {
+    vector<int> arr = {3, 8, 2, 6};
+    int n = arr.size();
+
+    vector<int> prefixXor(n);
+    prefixXor[0] = arr[0];
+    for (int i = 1; i < n; i++) {
+        prefixXor[i] = prefixXor[i-1] ^ arr[i];
+    }
+
+    // Example: XOR of subarray [1...3]
+    int L = 1, R = 3;
+    int subarrayXor;
+    if (L == 0)
+        subarrayXor = prefixXor[R];
+    else
+        subarrayXor = prefixXor[R] ^ prefixXor[L-1];
+
+    cout << "XOR of subarray [1...3] = " << subarrayXor << "\n";
+}
