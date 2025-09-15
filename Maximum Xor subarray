@@ -1,0 +1,86 @@
+#include <bits/stdc++.h>
+using namespace std;
+ 
+class Solution {
+public:
+    struct TrieNode {
+        TrieNode* left = nullptr;   // represents bit 0
+        TrieNode* right = nullptr;  // represents bit 1
+    };
+ 
+    // Insert a number into Trie (bit by bit, from MSB to LSB)
+    void insert(TrieNode* root, int num) {
+        TrieNode* cur = root;
+        for (int i = 31; i >= 0; i--) {
+            int bit = (num >> i) & 1;
+            if (bit == 0) {
+                if (!cur->left) cur->left = new TrieNode();
+                cur = cur->left;
+            } else {
+                if (!cur->right) cur->right = new TrieNode();
+                cur = cur->right;
+            }
+        }
+    }
+ 
+    // Query: for given num, find best XOR we can achieve with Trie numbers
+    int query(TrieNode* root, int num) {
+        TrieNode* cur = root;
+        int best = 0;
+        for (int i = 31; i >= 0; i--) {
+            int bit = (num >> i) & 1;
+ 
+            // If current bit is 0 -> we want 1 (opposite) for max XOR
+            // If current bit is 1 -> we want 0 (opposite) for max XOR
+            if (bit == 0) {
+                if (cur->right) { // found opposite bit
+                    best |= (1 << i); 
+                    cur = cur->right;
+                } else {
+                    cur = cur->left; // no choice
+                }
+            } else {
+                if (cur->left) {
+                    best |= (1 << i);
+                    cur = cur->left;
+                } else {
+                    cur = cur->right;
+                }
+            }
+        }
+        return best;
+    }
+ 
+    int maxSubarrayXOR(vector<int>& nums) {
+        TrieNode* root = new TrieNode();
+ 
+        insert(root, 0); 
+        // Insert 0 initially: handles subarray starting from index 0.
+        // (otherwise we miss cases like prefix itself being max XOR)
+ 
+        int prefixXor = 0, ans = 0;
+        for (int x : nums) {
+            prefixXor ^= x;  // build prefix XOR
+ 
+            // Try to maximize XOR with some earlier prefix
+            ans = max(ans, query(root, prefixXor));
+ 
+            // Store this prefix into Trie for future queries
+            insert(root, prefixXor);
+        }
+        return ans;
+    }
+};
+ 
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+ 
+    int n;
+    cin >> n;
+    vector<int> nums(n);
+    for (int i = 0; i < n; i++) cin >> nums[i];
+ 
+    Solution sol;
+    cout << sol.maxSubarrayXOR(nums) << "\n";
+}
